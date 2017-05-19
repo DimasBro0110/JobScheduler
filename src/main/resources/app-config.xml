@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo" xmlns:hz="http://www.hazelcast.com/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo.xsd http://www.hazelcast.com/schema/spring http://www.hazelcast.com/schema/spring/hazelcast-spring.xsd">
+
+    <mongo:mongo port="27017" host="127.0.0.1"/>
+    <mongo:db-factory dbname="BirdQueue"/>
+
+    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+    </bean>
+
+
+    <bean id="messageToQueueBean" class="com.dimas.brosalin.Mongo.MessageTemplate.MessageToQueue"/>
+    <bean id="messageService" class="com.dimas.brosalin.Mongo.MessageService.QueueMessageService">
+        <property name="mongoTemplate" ref="mongoTemplate"/>
+    </bean>
+
+
+    <bean id="hazelNetworkConfig" class="com.hazelcast.client.config.ClientNetworkConfig">
+        <property name="addresses">
+            <list>
+                <value>192.168.0.6:5701</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="hazelClientConfig" class="com.hazelcast.client.config.ClientConfig">
+        <property name="networkConfig" ref="hazelNetworkConfig"/>
+    </bean>
+
+    <bean id="hazelClientInstance" class="com.hazelcast.client.HazelcastClient" factory-method="newHazelcastClient">
+        <constructor-arg ref="hazelClientConfig"/>
+    </bean>
+
+    <bean id="jsonParser" class="com.dimas.brosalin.Tools.JsonMessageParser">
+        <property name="jsonParser" value="org.json.simple.parser.JSONParser"/>
+    </bean>
+
+    <bean id="hazelcastService" class="com.dimas.brosalin.InMemoryDatagrid.HazelcastLogic.HazelCastService">
+        <property name="hazelcastInstance" ref="hazelClientInstance"/>
+        <property name="listOfHazelCollections">
+            <list>
+                <value>testQueue1</value>
+                <value>queueTest2</value>
+            </list>
+        </property>
+    </bean>
+
+</beans>
