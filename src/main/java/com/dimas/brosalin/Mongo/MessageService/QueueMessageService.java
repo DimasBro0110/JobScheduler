@@ -1,8 +1,11 @@
 package com.dimas.brosalin.Mongo.MessageService;
 
 import com.dimas.brosalin.Mongo.MessageDAOLayer.MessageDAO;
+import com.dimas.brosalin.Mongo.MessageTemplate.MessageToQueue;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -11,11 +14,19 @@ import java.util.List;
  */
 public class QueueMessageService implements MessageDAO {
 
-    private MongoOperations mongoTemplate;
+    private MongoTemplate mongoTemplate;
 
     @Override
     public void persistMessageToDisc(Object object) {
+        System.out.println("Saving object");
+        System.out.println(object);
+        mongoTemplate.insert(object);
+        System.out.println("Object saved");
+    }
 
+    @Override
+    public void persistMessageToDisc(List<Object> listOfObjets) {
+        mongoTemplate.insertAll(listOfObjets);
     }
 
     @Override
@@ -33,11 +44,12 @@ public class QueueMessageService implements MessageDAO {
         return 0;
     }
 
-    public MongoOperations getMongoTemplate() {
+    public MongoTemplate getMongoTemplate() {
         return mongoTemplate;
     }
 
-    public void setMongoTemplate(MongoOperations mongoTemplate) {
+    public void setMongoTemplate(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
+
 }

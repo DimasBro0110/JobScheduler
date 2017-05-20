@@ -1,13 +1,16 @@
 package com.dimas.brosalin.InMemoryDatagrid.HazelcastLogic;
 
 import com.dimas.brosalin.InMemoryDatagrid.HazelcastDAOLayer.HazelcastDAO;
+import com.dimas.brosalin.Mongo.MessageTemplate.MessageToQueue;
 import com.dimas.brosalin.Tools.JsonMessageParser;
 import com.hazelcast.core.HazelcastInstance;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Created by DmitriyBrosalin on 19/05/2017.
@@ -35,7 +38,7 @@ public class HazelCastService implements HazelcastDAO{
     }
 
     @Override
-    public List<String> getMessagesFromCollection() {
+    public List<MessageToQueue> getMessagesFromCollection() {
         BlockingQueue<String> tempListOfWholeCollectionsBlocking;
         List<String> wholeListOfCollections;
         try{
@@ -53,7 +56,12 @@ public class HazelCastService implements HazelcastDAO{
                         curSize -= 1;
                     }
                 }
-                return wholeListOfCollections;
+                return wholeListOfCollections
+                        .stream()
+                        .parallel()
+                        .map(v -> jsonMessageParser.parseIncomingString(v))
+                        .map(v -> jsonMessageParser.parseJsonObjectToMessage(v))
+                        .collect(Collectors.toList());
             }
             else{
                 return null;
