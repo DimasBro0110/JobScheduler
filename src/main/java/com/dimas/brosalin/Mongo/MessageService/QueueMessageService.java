@@ -1,13 +1,18 @@
 package com.dimas.brosalin.Mongo.MessageService;
 
+import com.dimas.brosalin.InMemoryDatagrid.HazelcastLogic.HazelCastService;
 import com.dimas.brosalin.Mongo.MessageDAOLayer.MessageDAO;
 import com.dimas.brosalin.Mongo.MessageTemplate.MessageToQueue;
+import com.dimas.brosalin.Tools.JsonMessageParser;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by DmitriyBrosalin on 19/05/2017.
@@ -15,13 +20,23 @@ import java.util.List;
 public class QueueMessageService implements MessageDAO {
 
     private MongoTemplate mongoTemplate;
+    private JsonMessageParser jsonMessageParser;
+    private Logger logger = Logger.getLogger(QueueMessageService.class.getName());
 
     @Override
     public void persistMessageToDisc(Object object) {
-        System.out.println("Saving object");
-        System.out.println(object);
+        logger.log(Level.INFO, "Saving Object");
+        logger.log(Level.INFO, "Object is: " + object);
         mongoTemplate.insert(object);
-        System.out.println("Object saved");
+        logger.log(Level.INFO, "Object persisted");
+    }
+
+    @Override
+    public void persistMessageToDisc(Object object, String topicName) {
+        logger.log(Level.INFO, "Saving Object");
+        logger.log(Level.INFO, "Object is: " + object);
+        mongoTemplate.insert(object, topicName);
+        logger.log(Level.INFO, "Object persisted");
     }
 
     @Override

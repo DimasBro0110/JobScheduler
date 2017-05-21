@@ -2,6 +2,7 @@ import com.dimas.brosalin.InMemoryDatagrid.HazelcastLogic.HazelCastService;
 import com.dimas.brosalin.Mongo.MessageDAOLayer.MessageDAO;
 import com.dimas.brosalin.Mongo.MessageService.QueueMessageService;
 import com.dimas.brosalin.Mongo.MessageTemplate.MessageToQueue;
+import com.dimas.brosalin.Services.HazelcastPersistanceToMongoService;
 import com.dimas.brosalin.Tools.JsonMessageParser;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -41,19 +42,9 @@ public class Main {
     public static void main(String[] args) throws ParseException, InterruptedException {
 
         ApplicationContext context = new ClassPathXmlApplicationContext("app-config.xml");
-        MongoTemplate mongoOperations = (MongoTemplate) context.getBean("mongoTemplate");
-        QueueMessageService queueMessageService = (QueueMessageService) context.getBean("messageService");
-        MessageToQueue messageToQueue = new MessageToQueue();
-        messageToQueue.setId("5555");
-        messageToQueue.setTopicName("test");
-        messageToQueue.setMessagePlot("test message");
-        messageToQueue.setMessageTime(new Timestamp(System.currentTimeMillis()));
-        queueMessageService.persistMessageToDisc(messageToQueue);
-
-
-//        HazelCastService hazelCastService = (HazelCastService) context.getBean("hazelcastService");
-//        System.out.println(hazelCastService.getMessagesFromCollection());
-
+        HazelcastPersistanceToMongoService persistanceToMongoService =
+                (HazelcastPersistanceToMongoService) context.getBean("persistMessagesHazelcastToMongo");
+        persistanceToMongoService.doPersistanceJob();
 
     }
 

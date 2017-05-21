@@ -11,6 +11,7 @@ import java.util.List;
 public interface MessageDAO{
 
     void persistMessageToDisc(Object object);
+    void persistMessageToDisc(Object object, String topicName);
     void persistMessageToDisc(List<Object> listOfObjets);
     List<Object> getBatchOfMessagesFromDisc();
     int updateMessagesOnDisc(Timestamp timeIntervalMessages);

@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by DmitriyBrosalin on 19/05/2017.
@@ -20,6 +22,7 @@ public class HazelCastService implements HazelcastDAO{
     private HazelcastInstance hazelcastInstance;
     private List<String> listOfHazelCollections;
     private JsonMessageParser jsonMessageParser;
+    private Logger logger = Logger.getLogger(HazelCastService.class.getName());
 
     public HazelcastInstance getHazelcastInstance() {
         return hazelcastInstance;
@@ -56,12 +59,13 @@ public class HazelCastService implements HazelcastDAO{
                         curSize -= 1;
                     }
                 }
-                return wholeListOfCollections
-                        .stream()
-                        .parallel()
-                        .map(v -> jsonMessageParser.parseIncomingString(v))
-                        .map(v -> jsonMessageParser.parseJsonObjectToMessage(v))
-                        .collect(Collectors.toList());
+                return jsonMessageParser.sortByTimeMarker(
+                        wholeListOfCollections
+                            .stream()
+                            .map(v -> jsonMessageParser.parseIncomingString(v))
+                            .map(v -> jsonMessageParser.parseJsonObjectToMessage(v))
+                            .collect(Collectors.toList())
+                );
             }
             else{
                 return null;
