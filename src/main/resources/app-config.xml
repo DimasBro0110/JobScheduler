@@ -52,10 +52,38 @@
         <property name="jsonMessageParser" ref="jsonParser"/>
     </bean>
 
-    <bean name="persistMessagesHazelcastToMongo"
+    <bean id="persistMessagesHazelcastToMongo"
           class="com.dimas.brosalin.Services.HazelcastPersistanceToMongoService">
         <property name="hazelCastService" ref="hazelcastService"/>
         <property name="queueMessageService" ref="messageService"/>
+    </bean>
+
+    <bean name="schedulerJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+        <property name="jobClass" value="com.dimas.brosalin.Quartz.JobToSchedule"/>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="persistanceToMongoService" value-ref="persistMessagesHazelcastToMongo"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="serviceTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="schedulerJob"/>
+        <property name="repeatInterval" value="2000"/>
+        <property name="startDelay" value="1500"/>
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="jobDetails">
+            <list>
+                <ref bean="schedulerJob"/>
+            </list>
+        </property>
+        <property name="triggers">
+            <list>
+                <ref bean="serviceTrigger"/>
+            </list>
+        </property>
     </bean>
 
 </beans>

@@ -42,9 +42,9 @@ public class Main {
     public static void main(String[] args) throws ParseException, InterruptedException {
 
         ApplicationContext context = new ClassPathXmlApplicationContext("app-config.xml");
-        HazelcastPersistanceToMongoService persistanceToMongoService =
-                (HazelcastPersistanceToMongoService) context.getBean("persistMessagesHazelcastToMongo");
-        persistanceToMongoService.doPersistanceJob();
+//        HazelcastPersistanceToMongoService persistanceToMongoService =
+//                (HazelcastPersistanceToMongoService) context.getBean("persistMessagesHazelcastToMongo");
+//        persistanceToMongoService.doPersistanceJob();
 
     }
 
